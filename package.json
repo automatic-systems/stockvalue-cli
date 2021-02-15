@@ -1,0 +1,11 @@
+{
+  "name": "moneycontrol",
+  "version": "1.0.0",
+  "description": "Quick Utility to know the Stock price of your favourite company",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
