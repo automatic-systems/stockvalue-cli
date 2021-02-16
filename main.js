@@ -3,7 +3,7 @@ const choose_company = require('./choose.js');
 const quotes = require("./quote.js")
 
 async function main() {
-    const browser = await playwright.chromium.launch({headless:false});
+    const browser = await playwright.chromium.launch({headless:true});
     const context = await browser.newContext();
     const page = await context.newPage();
     while (true)
@@ -11,6 +11,7 @@ async function main() {
         try{
             await choose_company(page);
             var quote=await quotes(page)
+
             console.log()
             console.table(quote);
             await page.evaluate(() => window.stop());
