@@ -5,29 +5,35 @@
  */
 const prompt = require('./prompts_wrapper');
 class StocksSelection
-{
-	async  searchaCompany(page)
+{	
+	page;
+	constructor(page)
+	{
+		if(!page)throw "illegal page"
+		this.page=page
+	}
+	async  searchaCompany()
 	{
 		var {company_name}=await prompt([{type:'text',name:'company_name',message:'Enter name of Company :'}]);
-		await page.goto(`https://www.moneycontrol.com/stocks/cptmarket/compsearchnew.php?search_str=${company_name}`);
+		if(!company_name)throw "done"
+		await this.page.goto(`https://www.moneycontrol.com/stocks/cptmarket/compsearchnew.php?search_str=${company_name}`);
 	}
-	// async  isSearchResult(page)//or has been redireccted to quote page
-	// {
-	// 	var reg=new RegExp('/compsearchnew.php')	
-	// 	var url=await page.url()
-	// 	return reg.test(await page.url(url))
-	// }
-	async  isQuotePage(page)
+	async checkSearchFailed()
+	{
+		var text=await this.page.evaluate(()=>find("no matches"))
+		if (text)throw "Not Found"
+	}
+	async  isQuotePage()
 	{
 		var reg=new RegExp('/stockpricequote/')	
-		var url=await page.url()
+		var url=await this.page.url()
 		return reg.test(url);
 		
 	}
-	async  collectSearchResult(page)
+	async  collectSearchResult()
 	{
-		await page.waitForSelector('.srch_tbl');
-			var choices=await page.evaluate(
+		await this.page.waitForSelector('.srch_tbl');
+			var choices=await this.page.evaluate(
 				()=>[...document.querySelectorAll('.srch_tbl  tr td:first-child')]
 					.map(el=>[el.innerText,el.querySelector('a').href]));
 		return Object.fromEntries(choices)
@@ -44,16 +50,17 @@ class StocksSelection
 		if(options[company]==undefined)throw "error"
 		return options[company]
 	}
-	async  load(page)
+	async  load()
 	{
 		while (true)
 		{
-			await this.searchaCompany(page)
-			if (await this.isQuotePage(page)) break; // implies, a specific company name had been searched , hence not showing choices
-			var choices=await this.collectSearchResult(page)
+			await this.searchaCompany()
+			if (await this.isQuotePage()) break; // implies, a specific company name had been searched , hence not showing choices
+			await this.checkSearchFailed()
+			var choices=await this.collectSearchResult()
 			if (Object.keys(choices).length == 0)continue;// no result match, try again
 			var company_name=await this.ChooseFromSearchResult(choices)
-			await page.goto(choices[company_name]);
+			await this.page.goto(choices[company_name]);
 			break
 		}
 	}

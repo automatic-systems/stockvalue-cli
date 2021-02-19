@@ -16,6 +16,7 @@
     "byline": "^5.0.0",
     "chalk": "^4.1.0",
     "cli-spinners": "^2.5.0",
+    "debug": "^4.3.1",
     "enquirer": "^2.3.6",
     "git": "file:github.com:yniks/enquirer.git",
     "inquirer": "^7.3.3",

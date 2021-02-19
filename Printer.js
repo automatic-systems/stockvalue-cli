@@ -1,14 +1,13 @@
 const chalk = require("chalk");
+const debug=require('debug')('printer')
 class Printer {
   constructor({keys}) {
     this.keys = keys;
   }
   static getPrinter(...args) {
-    if (process.stdout.isTTY) {
-      if (process.yargs.output == "j") return new JSONPrinter(...args);
-      else return new TerminalPrinter(...args);
-    } else if (process.yargs.output == "c") return new CSVPrinter(...args);
-    else return new JSONPrinter(...args);
+    if (process.yargs.output == "json") return new JSONPrinter(...args);
+    else if (process.yargs.output == "csv") return new CSVPrinter(...args);
+    else return new TerminalPrinter(...args);
   }
   _select_entries(object) {
     return Object.fromEntries(
@@ -24,6 +23,7 @@ class JSONPrinter extends Printer {
         object = this._select_entries(object);
         console.log(JSON.stringify(object));
     })
+    debug("json printed")
   }
 }
 class CSVPrinter extends Printer {
@@ -40,6 +40,7 @@ class CSVPrinter extends Printer {
         object = this._select_entries(object);
         this._printline(Object.values(object));
     })
+    debug("csv printed")
   }
 }
 
@@ -62,6 +63,7 @@ class TerminalPrinter extends Printer {
     print(...objects)
     {
         console.table(this._restruct(objects.map(this._select_entries.bind(this))))
+        debug("table printed")
     }
   }
   
